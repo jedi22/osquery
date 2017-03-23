@@ -56,6 +56,35 @@ EXAMPLE_DISTRIBUTED_DISCOVERY = {
     }
 }
 
+EXAMPLE_DISTRIBUTED_SIGNATURES = {
+    "queries": {
+        "system_info": "select * from system_info",
+        "wifi_networks": "select * from wifi_networks",
+    },
+    "signatures": {
+        "system_info": "MEQCIG+LXnKC1TAWulo4czpKpcniFnLobkB/WwrtuaTJFj4sAiAgmIBZ5eWRUZ6BVVZK9jESpQx++5MN15vUfr1L2vuNFA==",
+        "wifi_networks": "MEUCIQC9G5eT+68URJE4kDdjaTjgm31itdUln7Zo3wV8NnrnlwIgfJ+4Xc3mJAnQ5b+0S4yaXHVxKLQSCCDuKlGo7HcKtSs="
+    }
+}
+
+EXAMPLE_DISTRIBUTED_DISCOVERY_SIGNATURES = {
+    "queries": {
+        "windows_info": "select * from system_info",
+        "darwin_chrome_ex": "select users.username, ce.* from users join chrome_extensions ce using (uid)",
+    },
+    "discovery": {
+        "windows_info": "select * from os_version where platform='windows'",
+        "darwin_chrome_ex": "select * from os_version where platform='darwin'"
+    },
+    "signatures": {
+        "windows_info": "MEQCIE5JXLbFNamhXLEV6qdpfOoUUotv36gHVgVEcFONpK7lAiA5UcDjiTtjGMQoS3F/tYno6OzuP4W/xqUmfd8vsjZiTA==",
+        "windows_info_disc": "MEYCIQCJfMgxjLivO7B0eN8WVC86onlM+MUw4cGVX7jn9RC8fwIhAJM3mXy8ZnNS+w7lATt8ZN6kiCWCYbA33tO3fmUvFtr7",
+
+        "darwin_chrome_ex": "MEQCIEQJgN3nBl4HbGJwA3nktIGmxIrDeJVfofCclLt13REsAiBa9d6Dku38KFuNm3vTq1vTScTWy0T0X3UAkbSzr9kFTg==",
+        "darwin_chrome_ex_disc": "MEUCIQDfSWGJf6iy785jOn9kZ3RIgp86ji3JFJM9NPa6jDbk8gIgbOeBtaxksJczlVTnuHh8Wh3DxAFnG2Zn3QWcZazE4To=",
+    }
+}
+
 EXAMPLE_DISTRIBUTED_ACCELERATE = {
     "queries": {
         "info": "select * from osquery_info",
@@ -201,7 +230,7 @@ class RealSimpleHandler(BaseHTTPRequestHandler):
         if "node_key" not in request or request["node_key"] not in NODE_KEYS:
             self._reply(FAILED_ENROLL_RESPONSE)
             return
-        self._reply(EXAMPLE_DISTRIBUTED)
+        self._reply(EXAMPLE_DISTRIBUTED_SIGNATURES)
 
     def distributed_write(self, request):
         '''A basic distributed write endpoint'''

@@ -11,6 +11,7 @@ endif()
 ADD_OSQUERY_LIBRARY(TRUE osquery_core
   conversions.cpp
   init.cpp
+  signing.cpp
   system.cpp
   ${OS_CORE_SOURCE}
   tables.cpp
