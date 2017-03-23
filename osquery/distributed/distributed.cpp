@@ -18,6 +18,7 @@
 #include <osquery/system.h>
 
 #include "osquery/core/conversions.h"
+#include "osquery/core/signing.h"
 #include "osquery/core/json.h"
 
 namespace pt = boost::property_tree;
@@ -172,6 +173,19 @@ Status Distributed::acceptWork(const std::string& work) {
       pt::read_json(ss, tree);
     }
     std::set<std::string> queries_to_run;
+    std::map<std::string, std::string> signatures;
+
+    if (tree.count("signatures") > 0) {
+      auto& signature_tree = tree.get_child("signatures");
+      for (const auto& node : signature_tree) {
+        auto sig = signature_tree.get<std::string>(node.first, "");
+        if (sig.empty() || node.first.empty()) {
+          continue;
+        }
+        signatures[node.first] = sig;
+      }
+    }
+
     // Check for and run discovery queries first
     if (tree.count("discovery") > 0) {
       auto& queries = tree.get_child("discovery");
@@ -182,6 +196,20 @@ Status Distributed::acceptWork(const std::string& work) {
           return Status(
               1,
               "Distributed discovery query does not have complete attributes");
+        }
+        if (doesQueryRequireSignature(query)) {
+          if (signatures.count(node.first + "_disc") > 0) {
+            if (!verifyQuerySignature(signatures[node.first + "_disc"], query).ok()) {
+              // Verification failed so don't run
+              LOG(INFO) << "Failed verification for: " << query;
+              continue;
+            }
+          } else {
+            // There is no signature so don't run this query, this has the
+            // side effect of also not running the query that this was
+            // discovery for
+            continue;
+          }
         }
         SQL sql(query);
         if (!sql.getStatus().ok()) {
@@ -198,6 +226,18 @@ Status Distributed::acceptWork(const std::string& work) {
       auto query = queries.get<std::string>(node.first, "");
       if (query.empty() || node.first.empty()) {
         return Status(1, "Distributed query does not have complete attributes");
+      }
+      if (doesQueryRequireSignature(query)) {
+        if (signatures.count(node.first) > 0) {
+          if (!verifyQuerySignature(signatures[node.first], query).ok()) {
+            // Verification failed so don't run
+            LOG(INFO) << "Failed verification for: " << query;
+            continue;
+          }
+        } else {
+          // There is no signature so don't run
+          continue;
+        }
       }
       if (queries_to_run.empty() || queries_to_run.count(node.first)) {
         setDatabaseValue(kQueries, kDistributedQueryPrefix + node.first, query);
