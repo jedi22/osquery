@@ -273,5 +273,24 @@ QueryData genOsquerySchedule(QueryContext& context) {
       });
   return results;
 }
+
+QueryData genOsqueryStrictMode(QueryContext& context) {
+  QueryData results;
+  std::string strict_mode_key;
+  std::string uuid_signing;
+  std::string query_counter;
+  std::string enabled;
+  getDatabaseValue(kPersistentSettings, "strict_mode_enabled", enabled);
+  getDatabaseValue(kPersistentSettings, "strict_mode_pub_key", strict_mode_key);
+  getDatabaseValue(kPersistentSettings, "strict_mode_uuid_signing", uuid_signing);
+  getDatabaseValue(kPersistentSettings, "strict_mode_query_counter", query_counter);
+  Row r;
+  r["enabled"] = SQL_TEXT(enabled);
+  r["public_key"] = SQL_TEXT(strict_mode_key);
+  r["uuid_signing"] = SQL_TEXT(uuid_signing);
+  r["counter"] = INTEGER(query_counter);
+  results.push_back(r);
+  return results;
+}
 }
 }

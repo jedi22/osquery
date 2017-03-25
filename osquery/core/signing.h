@@ -9,11 +9,11 @@
  */
 namespace osquery {
 
-Status verifySignature(std::string b64Pub, std::string b64Sig, std::string message);
+Status verifySignature(const std::string& b64Pub, const std::string& b64Sig, const std::string& message);
 
-Status verifyStrictSignature(std::string b64Sig, std::string message);
+Status verifyStrictSignature(const std::string& b64Sig, const std::string& message);
 
-Status verifyQuerySignature(std::string b64Sig, std::string query);
+Status verifyQuerySignature(const std::string& b64Sig, const std::string& query);
 
-bool doesQueryRequireSignature(std::string query);
+bool doesQueryRequireSignature(const std::string& query);
 }

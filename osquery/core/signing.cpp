@@ -10,6 +10,9 @@
 #include <openssl/ecdsa.h>
 #include <openssl/pem.h>
 
+#include <boost/uuid/uuid_generators.hpp>
+#include <boost/uuid/uuid_io.hpp>
+
 #include <osquery/database.h>
 #include <osquery/logger.h>
 #include <osquery/sql.h>
@@ -21,7 +24,7 @@
 
 namespace osquery {
 
-Status verifySignature(std::string b64Pub, std::string b64Sig, std::string message){
+Status verifySignature(const std::string& b64Pub, const std::string& b64Sig, const std::string& message){
 	Status ret;
 
 	std::string pub_key = base64Decode(b64Pub);
@@ -55,7 +58,7 @@ Status verifySignature(std::string b64Pub, std::string b64Sig, std::string messa
 	EC_KEY_free(key);
 	return ret;
 }
-Status verifyStrictSignature(std::string b64Sig, std::string message) {
+Status verifyStrictSignature(const std::string& b64Sig, const std::string& message) {
 	std::string strict_mode_key;
 	getDatabaseValue(kPersistentSettings, "strict_mode_pub_key", strict_mode_key);
 	if (strict_mode_key.empty()) {
@@ -64,24 +67,42 @@ Status verifyStrictSignature(std::string b64Sig, std::string message) {
 	return verifySignature(strict_mode_key, b64Sig, message);
 }
 
-Status verifyQuerySignature(std::string b64Sig, std::string query) {
+Status verifyQuerySignature(const std::string& b64Sig, const std::string& query) {
 	std::string strict_mode_key;
 	std::string uuid_signing;
+	std::string query_counter;
 	getDatabaseValue(kPersistentSettings, "strict_mode_pub_key", strict_mode_key);
+	getDatabaseValue(kPersistentSettings, "strict_mode_uuid_signing", uuid_signing);
+	getDatabaseValue(kPersistentSettings, "strict_mode_query_counter", query_counter);
 	if (strict_mode_key.empty()) {
 		return Status(0, "No strict mode key");
 	}
-	getDatabaseValue(kPersistentSettings, "strict_mode_uuid_signing", uuid_signing);
+
+	Status s;
+	std::string secure_query = query;
 	if (uuid_signing == "true"){
 		std::string uuid;
 		osquery::getHostUUID(uuid);
-		return verifySignature(strict_mode_key, b64Sig, query + "\n" + uuid);
-	} else {
-		return verifySignature(strict_mode_key, b64Sig, query);
+		secure_query += "\n" + uuid;
 	}
+	secure_query += "\n" + query_counter;
+	s = verifySignature(strict_mode_key, b64Sig, secure_query);
+
+	// Don't increment the counter if the verification fails
+	if (s.ok()) {
+		size_t counter;
+		safeStrtoul(query_counter, 10, counter);
+		++counter;
+		setDatabaseValue(
+			kPersistentSettings,
+			"strict_mode_query_counter",
+			std::to_string(counter)
+		);
+	}
+	return s;
 }
 
-bool doesQueryRequireSignature(std::string query){
+bool doesQueryRequireSignature(const std::string& query){
 	std::set<std::string> protected_tables;
 	std::vector<std::string> tables;
     {

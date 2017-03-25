@@ -14,6 +14,8 @@
 
 #include <boost/algorithm/string/replace.hpp>
 #include <boost/algorithm/string/trim.hpp>
+#include <boost/uuid/uuid_generators.hpp>
+#include <boost/uuid/uuid_io.hpp>
 
 #include <openssl/ecdsa.h>
 #include <openssl/pem.h>
@@ -474,9 +476,11 @@ Status Config::updateSource(const std::string& source,
       std::string old_key;
       std::string old_uuid_signing;
       std::string old_protected_tables;
+      std::string query_counter;
       getDatabaseValue(kPersistentSettings, "strict_mode_pub_key", old_key);
       getDatabaseValue(kPersistentSettings, "strict_mode_uuid_signing", old_uuid_signing);
       getDatabaseValue(kPersistentSettings, "strict_mode_tables", old_protected_tables);
+      getDatabaseValue(kPersistentSettings, "strict_mode_query_counter", query_counter);
 
       if (old_key != b64Pub) {
         LOG(WARNING) << "osquery had its strict mode key changed!";
@@ -490,6 +494,15 @@ Status Config::updateSource(const std::string& source,
         LOG(WARNING) << "osquery had its protected tabled changed!";
         setDatabaseValue(kPersistentSettings, "strict_mode_tables", protected_tables);
       }
+      if (query_counter == "") {
+        LOG(WARNING) << "osquery could not find a query count, starting at 0";
+        setDatabaseValue(
+          kPersistentSettings,
+          "strict_mode_query_counter",
+          "0"
+        );
+      }
+      setDatabaseValue(kPersistentSettings, "strict_mode_enabled", "true");
       LOG(INFO) << "osquery strict mode enabled";
     }
   } else {
@@ -497,6 +510,7 @@ Status Config::updateSource(const std::string& source,
     // no tables blocked, but this will give you warning if you previously
     // had strict mode enabled and it was turned off via configuration changes
     LOG(WARNING) << "osquery is not running in strict mode!";
+    setDatabaseValue(kPersistentSettings, "strict_mode_enabled", "false");
   }
 
   // extract the "schedule" key and store it as the main pack

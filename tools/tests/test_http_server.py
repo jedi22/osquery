@@ -27,6 +27,18 @@ import threading
 from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
 from urlparse import parse_qs
 
+ENABLE_SIGNING = True
+EXAMPLE_PRIVATE_KEY = "-----BEGIN EC PARAMETERS-----\nBgUrgQQACg==\n-----END EC PARAMETERS-----\n-----BEGIN EC PRIVATE KEY-----\nMHQCAQEEIOHxZ2iGobFdRIQZSDcT44AyLiwY/ALyL7DUVcDb172joAcGBSuBBAAK\noUQDQgAEuN+ZqVndrMy5npAg6TJP6LtdZBeGmICRKD4uluz9C3MdqXbe1PMqFYov\nXVHrlNbdv+E9/Bqbub+ITB+4zpnAGg==\n-----END EC PRIVATE KEY-----"
+HOST_UUID = "A08CC042-024C-50B4-B478-6914480B7397"
+SIGNING_KEY = None
+QUERY_COUNTER = 0
+if ENABLE_SIGNING:
+    # Imports for signing
+    import ecdsa
+    import hashlib
+    SIGNING_KEY = ecdsa.SigningKey.from_pem(EXAMPLE_PRIVATE_KEY)
+
+
 EXAMPLE_CONFIG = {
     "schedule": {
         "tls_proc": {"query": "select * from processes", "interval": 1},
@@ -40,8 +52,8 @@ EXAMPLE_NODE_CONFIG["node"] = True
 
 EXAMPLE_DISTRIBUTED = {
     "queries": {
-        "info": "select * from osquery_info",
-        "flags": "select * from osquery_flags",
+        "info": "select * from system_info",
+        "flags": "select * from wifi_networks",
     }
 }
 
@@ -53,35 +65,6 @@ EXAMPLE_DISTRIBUTED_DISCOVERY = {
     "discovery": {
         "windows_info": "select * from os_version where platform='windows'",
         "darwin_chrome_ex": "select * from os_version where platform='darwin'"
-    }
-}
-
-EXAMPLE_DISTRIBUTED_SIGNATURES = {
-    "queries": {
-        "system_info": "select * from system_info",
-        "wifi_networks": "select * from wifi_networks",
-    },
-    "signatures": {
-        "system_info": "MEQCIG+LXnKC1TAWulo4czpKpcniFnLobkB/WwrtuaTJFj4sAiAgmIBZ5eWRUZ6BVVZK9jESpQx++5MN15vUfr1L2vuNFA==",
-        "wifi_networks": "MEUCIQC9G5eT+68URJE4kDdjaTjgm31itdUln7Zo3wV8NnrnlwIgfJ+4Xc3mJAnQ5b+0S4yaXHVxKLQSCCDuKlGo7HcKtSs="
-    }
-}
-
-EXAMPLE_DISTRIBUTED_DISCOVERY_SIGNATURES = {
-    "queries": {
-        "windows_info": "select * from system_info",
-        "darwin_chrome_ex": "select users.username, ce.* from users join chrome_extensions ce using (uid)",
-    },
-    "discovery": {
-        "windows_info": "select * from os_version where platform='windows'",
-        "darwin_chrome_ex": "select * from os_version where platform='darwin'"
-    },
-    "signatures": {
-        "windows_info": "MEQCIE5JXLbFNamhXLEV6qdpfOoUUotv36gHVgVEcFONpK7lAiA5UcDjiTtjGMQoS3F/tYno6OzuP4W/xqUmfd8vsjZiTA==",
-        "windows_info_disc": "MEYCIQCJfMgxjLivO7B0eN8WVC86onlM+MUw4cGVX7jn9RC8fwIhAJM3mXy8ZnNS+w7lATt8ZN6kiCWCYbA33tO3fmUvFtr7",
-
-        "darwin_chrome_ex": "MEQCIEQJgN3nBl4HbGJwA3nktIGmxIrDeJVfofCclLt13REsAiBa9d6Dku38KFuNm3vTq1vTScTWy0T0X3UAkbSzr9kFTg==",
-        "darwin_chrome_ex_disc": "MEUCIQDfSWGJf6iy785jOn9kZ3RIgp86ji3JFJM9NPa6jDbk8gIgbOeBtaxksJczlVTnuHh8Wh3DxAFnG2Zn3QWcZazE4To=",
     }
 }
 
@@ -230,7 +213,18 @@ class RealSimpleHandler(BaseHTTPRequestHandler):
         if "node_key" not in request or request["node_key"] not in NODE_KEYS:
             self._reply(FAILED_ENROLL_RESPONSE)
             return
-        self._reply(EXAMPLE_DISTRIBUTED_SIGNATURES)
+        if ENABLE_SIGNING:
+            global QUERY_COUNTER
+            sk = ecdsa.SigningKey.from_pem(EXAMPLE_PRIVATE_KEY)
+            signed_distributed = EXAMPLE_DISTRIBUTED
+            signed_distributed['signatures'] = {}
+            for query in signed_distributed['queries']:
+                sig = base64.standard_b64encode(sk.sign(signed_distributed['queries'][query]+"\n"+HOST_UUID+"\n"+str(QUERY_COUNTER), hashfunc=hashlib.sha256, sigencode=ecdsa.util.sigencode_der))
+                signed_distributed['signatures'][query] = sig
+                QUERY_COUNTER += 1
+            self._reply(signed_distributed)
+        else:
+            self._reply(EXAMPLE_DISTRIBUTED)
 
     def distributed_write(self, request):
         '''A basic distributed write endpoint'''
