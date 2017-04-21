@@ -12,6 +12,7 @@ schema([
         aliases=["environment_count"]),
     Column("env_size", BIGINT, "Actual size (bytes) of environment list",
         aliases=["environment_size"]),
+    Column("auid", BIGINT, "Audit User ID at process start"),
     Column("uid", BIGINT, "User ID at process start"),
     Column("euid", BIGINT, "Effective user ID at process start"),
     Column("gid", BIGINT, "Group ID at process start"),
@@ -30,6 +31,7 @@ schema([
     Column("parent", BIGINT, "Process parent's PID"),
     Column("time", BIGINT, "Time of execution in UNIX time"),
     Column("uptime", BIGINT, "Time of execution in system uptime"),
+    Column("eid", TEXT, "Event ID", hidden=True),
 ])
 attributes(event_subscriber=True)
 implementation("process_events@process_events::genTable")

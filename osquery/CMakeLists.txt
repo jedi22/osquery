@@ -25,7 +25,6 @@ else()
   add_compile_options(
     -Wall
     -Wextra
-    -Wshadow
     -pedantic
     -Wuseless-cast
     -Wno-c99-extensions
@@ -33,6 +32,11 @@ else()
     -Wno-unused-parameter
     -Wno-gnu-case-range
   )
+  if(NOT FREEBSD)
+    add_compile_options(
+      -Wshadow
+    )
+  endif()
 endif()
 
 if(WINDOWS)
@@ -44,6 +48,7 @@ if(WINDOWS)
   ADD_OSQUERY_LINK_CORE("Wtsapi32.lib")
   ADD_OSQUERY_LINK_CORE("wbemuuid.lib")
   ADD_OSQUERY_LINK_CORE("linenoise.lib")
+  ADD_OSQUERY_LINK_CORE("taskschd.lib")
   ADD_OSQUERY_LINK_CORE("libboost_system-vc140-mt-s-1_63")
   ADD_OSQUERY_LINK_CORE("libboost_regex-vc140-mt-s-1_63")
   ADD_OSQUERY_LINK_CORE("libboost_filesystem-vc140-mt-s-1_63")
@@ -83,7 +88,7 @@ elseif(FREEBSD)
   ADD_OSQUERY_LINK_CORE("boost_thread")
   ADD_OSQUERY_LINK_CORE("boost_context")
 
-  ADD_OSQUERY_LINK_ADDITIONAL("rocksdb")
+  ADD_OSQUERY_LINK_ADDITIONAL("rocksdb-lite")
   ADD_OSQUERY_LINK_ADDITIONAL("boost_regex")
 endif()
 
@@ -162,6 +167,7 @@ add_subdirectory(logger)
 add_subdirectory(registry)
 add_subdirectory(sql)
 add_subdirectory(remote)
+add_subdirectory(carver)
 
 # Add externals directory from parent
 add_subdirectory("${CMAKE_SOURCE_DIR}/external" "${CMAKE_BINARY_DIR}/external")

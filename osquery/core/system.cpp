@@ -74,7 +74,13 @@ FLAG(string,
      host_identifier,
      "hostname",
      "Field used to identify the host running osquery (hostname, uuid, "
-     "instance, ephemeral)");
+     "instance, ephemeral, specified)");
+
+// Only used when host_identifier=specified
+FLAG(string,
+     specified_identifier,
+     "",
+     "Field used to specify the host_identifier when set to \"specified\"");
 
 FLAG(bool, utc, true, "Convert all UNIX times to UTC");
 
@@ -111,7 +117,6 @@ std::string getHostname() {
 }
 
 std::string generateNewUUID() {
-  VLOG(1) << "Cannot retrieve platform UUID: generating an ephemeral UUID";
   boost::uuids::uuid uuid = boost::uuids::random_generator()();
   return boost::uuids::to_string(uuid);
 }
@@ -149,6 +154,7 @@ std::string generateHostUUID() {
   }
 
   // Unable to get the hardware UUID, just return a new UUID
+  VLOG(1) << "Cannot retrieve platform UUID: generating an ephemeral UUID";
   return generateNewUUID();
 }
 
@@ -188,17 +194,32 @@ Status getHostUUID(std::string& ident) {
   return status;
 }
 
+Status getSpecifiedUUID(std::string& ident) {
+  if (FLAGS_specified_identifier.empty()) {
+    return Status(1, "No specified identifier for host");
+  }
+  ident = FLAGS_specified_identifier;
+  return Status(0, "OK");
+}
+
 std::string getHostIdentifier() {
   static std::string ident;
 
+  Status result(2);
   if (ident.size() == 0) {
     if (FLAGS_host_identifier == "uuid") {
-      getHostUUID(ident);
+      result = getHostUUID(ident);
     } else if (FLAGS_host_identifier == "instance") {
-      getInstanceUUID(ident);
+      result = getInstanceUUID(ident);
     } else if (FLAGS_host_identifier == "ephemeral") {
-      getEphemeralUUID(ident);
-    } else {
+      result = getEphemeralUUID(ident);
+    } else if (FLAGS_host_identifier == "specified") {
+      result = getSpecifiedUUID(ident);
+    }
+
+    if (!result.ok()) {
+      // https://github.com/facebook/osquery/issues/3174
+
       // assuming the default of "hostname" as the machine identifier
       // intentionally not set to `ident` because the hostname may change
       // throughout the life of the process and we always want to be using the
@@ -209,15 +230,45 @@ std::string getHostIdentifier() {
   return ident;
 }
 
+std::string toAsciiTime(const struct tm* tm_time) {
+  if (tm_time == nullptr) {
+    return "";
+  }
+
+  auto time_str = platformAsctime(tm_time);
+  boost::algorithm::trim(time_str);
+  return time_str + " UTC";
+}
+
+std::string toAsciiTimeUTC(const struct tm* tm_time) {
+  size_t epoch = toUnixTime(tm_time);
+  struct tm tptr;
+
+  memset(&tptr, 0, sizeof(tptr));
+
+  if (epoch == (size_t)-1) {
+    return "";
+  }
+
+  gmtime_r((time_t*)&epoch, &tptr);
+  return toAsciiTime(&tptr);
+}
+
 std::string getAsciiTime() {
   auto result = std::time(nullptr);
 
   struct tm now;
   gmtime_r(&result, &now);
 
-  auto time_str = platformAsctime(&now);
-  boost::algorithm::trim(time_str);
-  return time_str + " UTC";
+  return toAsciiTime(&now);
+}
+
+size_t toUnixTime(const struct tm* tm_time) {
+  struct tm result;
+  memset(&result, 0, sizeof(result));
+
+  memcpy(&result, tm_time, sizeof(result));
+  return mktime(&result);
 }
 
 size_t getUnixTime() {
@@ -360,7 +411,7 @@ bool DropPrivileges::dropTo(const std::string& user) {
 bool setThreadEffective(uid_t uid, gid_t gid) {
 #if defined(__APPLE__)
   return (pthread_setugid_np(uid, gid) == 0);
-#elif defined(LINUX)
+#elif defined(__linux__)
   return (syscall(SYS_setresgid, -1, gid, -1) == 0 &&
           syscall(SYS_setresuid, -1, uid, -1) == 0);
 #endif

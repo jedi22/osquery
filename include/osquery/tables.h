@@ -18,11 +18,26 @@
 #include <vector>
 
 #ifdef WIN32
+#ifndef WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN
+#endif
+#ifndef NOMINMAX
 #define NOMINMAX
 #endif
+#endif
 
+#ifndef WIN32
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wunused-variable"
+#endif
+
+/// Wrap this include with the above and below ignored warnings for FreeBSD.
 #include <boost/coroutine2/all.hpp>
+
+#ifndef WIN32
+#pragma clang diagnostic pop
+#endif
+
 #include <boost/lexical_cast.hpp>
 #include <boost/property_tree/ptree.hpp>
 
@@ -538,6 +553,7 @@ struct QueryContext : private only_movable {
   ~QueryContext() {
     if (!enable_cache_ && table_ != nullptr) {
       delete table_;
+      table_ = nullptr;
     }
   }
 

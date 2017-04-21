@@ -5,6 +5,7 @@ schema([
     Column("pid", BIGINT, "Process (or thread) ID"),
     Column("path", TEXT, "Path of executed file"),
     Column("fd", TEXT, "The file description for the process socket"),
+    Column("auid", BIGINT, "Audit User ID"),
     Column("success", INTEGER, "The socket open attempt status"),
     Column("family", INTEGER, "The Internet protocol family ID"),
     Column("protocol", INTEGER, "The network protocol ID"),
@@ -15,6 +16,7 @@ schema([
     Column("socket", TEXT, "The local path (UNIX domain socket only)"),
     Column("time", BIGINT, "Time of execution in UNIX time"),
     Column("uptime", BIGINT, "Time of execution in system uptime"),
+    Column("eid", TEXT, "Event ID", hidden=True),
 ])
 attributes(event_subscriber=True)
 implementation("socket_events@socket_events::genTable")

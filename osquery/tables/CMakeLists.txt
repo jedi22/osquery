@@ -40,6 +40,8 @@ elseif(WINDOWS)
   # Additional Windows libraries
   ADD_OSQUERY_LINK_ADDITIONAL("Advapi32.lib")
   ADD_OSQUERY_LINK_ADDITIONAL("version.lib")
+  ADD_OSQUERY_LINK_ADDITIONAL("Iphlpapi.lib")
+  ADD_OSQUERY_LINK_ADDITIONAL("Ws2_32.lib")
 
   # Windows specific tables
   file(GLOB OSQUERY_WINDOWS_TABLES "*/windows/*.cpp")
@@ -68,10 +70,12 @@ else()
   ADD_OSQUERY_LINK_ADDITIONAL("rpm rpmio beecrypt popt db")
 endif()
 
+if(APPLE OR LINUX OR FREEBSD)
+  ADD_OSQUERY_LINK_ADDITIONAL("lldpctl")
+endif()
+
 if(APPLE OR LINUX)
   file(GLOB OSQUERY_CROSS_EVENTS_TABLES "events/*.cpp")
-
-  ADD_OSQUERY_LINK_ADDITIONAL("lldpctl")
 else()
   # TODO: When we have Windows events, fill this in
   set(OSQUERY_CROSS_EVENTS_TABLES "")
@@ -80,7 +84,7 @@ endif()
 # TODO: These tables should be made Windows-compatible
 if(NOT WINDOWS)
   file(GLOB OSQUERY_POSIX_NETWORKING_TABLES "networking/posix/*.cpp")
-  file(GLOB OSQUERY_CROSS_FORENSIC_TABLES "forensic/*.cpp")
+  file(GLOB OSQUERY_POSIX_FORENSIC_TABLES "forensic/posix/*.cpp")
 
   file(GLOB OSQUERY_POSIX_APPLICATIONS_TABLES "applications/posix/*.cpp")
   file(GLOB OSQUERY_POSIX_SYSTEM_TABLES "system/posix/*.cpp")
@@ -89,7 +93,7 @@ if(NOT WINDOWS)
     ${OSQUERY_POSIX_APPLICATIONS_TABLES}
     ${OSQUERY_POSIX_NETWORKING_TABLES}
     ${OSQUERY_CROSS_EVENTS_TABLES}
-    ${OSQUERY_CROSS_FORENSIC_TABLES}
+    ${OSQUERY_POSIX_FORENSIC_TABLES}
     ${OSQUERY_POSIX_SYSTEM_TABLES}
   )
 
@@ -100,6 +104,11 @@ if(NOT WINDOWS)
   ADD_OSQUERY_LINK_ADDITIONAL("tsk")
   ADD_OSQUERY_LINK_ADDITIONAL("augeas fa xml2")
 endif()
+
+file(GLOB OSQUERY_CROSS_FORENSIC_TABLES "forensic/*.cpp")
+ADD_OSQUERY_LIBRARY_ADDITIONAL(osquery_tables_forensic
+  ${OSQUERY_CROSS_FORENSIC_TABLES}
+)
 
 file(GLOB OSQUERY_CROSS_APPLICATIONS_TABLES "applications/*.cpp")
 ADD_OSQUERY_LIBRARY_ADDITIONAL(osquery_tables_applications

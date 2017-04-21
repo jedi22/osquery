@@ -114,8 +114,10 @@ Status readFile(const fs::path& path,
                              ? FLAGS_read_max
                              : std::min(FLAGS_read_max, FLAGS_read_user_max));
   if (file_size > read_max) {
-    VLOG(1) << "Cannot read " << path << " size exceeds limit: " << file_size
-            << " > " << read_max;
+    LOG(WARNING) << "Cannot read file that exceeds size limit: "
+                 << path.string();
+    VLOG(1) << "Cannot read " << path.string()
+            << " size exceeds limit: " << file_size << " > " << read_max;
     return Status(1, "File exceeds read limits");
   }
 
@@ -390,8 +392,8 @@ std::set<fs::path> getHomeDirectories() {
   return results;
 }
 
-bool safePermissions(const std::string& dir,
-                     const std::string& path,
+bool safePermissions(const fs::path& dir,
+                     const fs::path& path,
                      bool executable) {
   if (!platformIsFileAccessible(path).ok()) {
     // Path was not real, had too may links, or could not be accessed.
@@ -412,7 +414,7 @@ bool safePermissions(const std::string& dir,
     return false;
   }
 
-  PlatformFile fd(path, PF_OPEN_EXISTING | PF_READ);
+  PlatformFile fd(path.string(), PF_OPEN_EXISTING | PF_READ);
   if (!fd.isValid()) {
     return false;
   }

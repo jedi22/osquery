@@ -206,6 +206,10 @@ It is common for TLS/HTTPS servers to enforce a maximum request body size. The d
 
 Use this only in emergency situations as size violations are dropped. It is extremely uncommon for this to occur, as the `--value_max` for each column would need to be drastically larger, or the offending table would have to implement several hundred columns.
 
+`--logger_min_status=0`
+
+The minimum level for status log recording. Use the following values: `INFO = 0, WARNING = 1, ERROR = 2`. To disable all status messages use 3+. When using `--verbose` this value is ignored.
+
 `--distributed_tls_read_endpoint=""`
 
 The URI path which will be used, in conjunction with `--tls_hostname`, to create the remote URI for retrieving distributed queries when using the **tls** distributed plugin.
@@ -285,9 +289,15 @@ Maximum number of events to buffer in the backing store while waiting for a quer
 
 **Windows Only**
 
-`--windows_event_channels="System,Application,Setup,Security"`
+`--windows_event_channels=System,Application,Setup,Security`
 
-List of Windows event log channels to subscribe to. By default the Windows event log publisher will subscribe to some of the more common major event log channels. However you can subscribe to additional channels using the `Log Name` field value in the Windows event viewer. For example, to subscribe to Windows Powershell script block logging one would first enable the feature and then subscribe to the channel with `--windows_event_channels="Microsoft-Windows-PowerShell/Operational"`
+List of Windows event log channels to subscribe to. By default the Windows event log publisher will subscribe to some of the more common major event log channels. However you can subscribe to additional channels using the `Log Name` field value in the Windows event viewer. Note the lack of quotes around the channel names. For example, to subscribe to Windows Powershell script block logging one would first enable the feature and then subscribe to the channel with `--windows_event_channels=Microsoft-Windows-PowerShell/Operational`
+
+**Linux Only**
+
+`--hardware_disabled_types=partition`
+
+This is a comma-separated list of UDEV types to drop. On machines with flash-backed storage it is likely you'll encounter lots of noise from `disk` and `partition` types.
 
 ### Logging/results flags
 
