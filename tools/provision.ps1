@@ -271,13 +271,13 @@ function Install-ThirdParty {
   #      Once our chocolatey packages are added to the official repository, installing the third-party
   #      dependencies will be as easy as Install-ChocoPackage '<package-name>'.
   $packages = @(
-    "aws-sdk-cpp.0.14.4",
+    "aws-sdk-cpp.1.0.107",
     "boost-msvc14.1.63.0-r1",
     "bzip2.1.0.6",
     "doxygen.1.8.11",
     "gflags-dev.2.2.0",
     "glog.0.3.4",
-    "openssl.1.0.2-j",
+    "openssl.1.0.2-k",
     "rocksdb.5.1.4",
     "snappy-msvc.1.1.1.8",
     "thrift-dev.0.9.3",
