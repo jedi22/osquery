@@ -71,25 +71,29 @@ Status verifyQuerySignature(const std::string& b64Sig, const std::string& query)
 	std::string strict_mode_key;
 	std::string uuid_signing;
 	std::string query_counter;
+	std::string counter_mode;
 	getDatabaseValue(kPersistentSettings, "strict_mode_pub_key", strict_mode_key);
 	getDatabaseValue(kPersistentSettings, "strict_mode_uuid_signing", uuid_signing);
 	getDatabaseValue(kPersistentSettings, "strict_mode_query_counter", query_counter);
+	getDatabaseValue(kPersistentSettings, "strict_mode_counter_mode", counter_mode);
 	if (strict_mode_key.empty()) {
 		return Status(0, "No strict mode key");
 	}
 
 	Status s;
 	std::string secure_query = query;
-	if (uuid_signing == "true"){
+	if (uuid_signing == "true") {
 		std::string uuid;
 		osquery::getHostUUID(uuid);
 		secure_query += "\n" + uuid;
 	}
-	secure_query += "\n" + query_counter;
+	if (counter_mode == "true") {
+		secure_query += "\n" + query_counter;
+	}
 	s = verifySignature(strict_mode_key, b64Sig, secure_query);
 
 	// Don't increment the counter if the verification fails
-	if (s.ok()) {
+	if (s.ok() && counter_mode == "true") {
 		size_t counter;
 		safeStrtoul(query_counter, 10, counter);
 		++counter;

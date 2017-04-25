@@ -458,12 +458,12 @@ Status Config::updateSource(const std::string& source,
       std::string b64Pub = strict_mode.get_child("pub_key").get_value("");
       std::string b64Sig = strict_mode.get_child("protected_tables_sig").get_value("");
       std::string uuid_signing = strict_mode.get_child("uuid_signing").get_value("");
+      std::string counter_mode = strict_mode.get_child("counter_mode").get_value("");
 
       std::string protected_tables;
       for (const auto &item : strict_mode.get_child("protected_tables")){
         protected_tables.append(item.second.get_value("")+",");
       }
-
       Status strict_status = verifySignature(b64Pub, b64Sig, protected_tables);
       // Strict mode tried to start but failed in verification, we should quit
       if (!strict_status.ok()) {
@@ -475,12 +475,14 @@ Status Config::updateSource(const std::string& source,
       // have changed
       std::string old_key;
       std::string old_uuid_signing;
+      std::string old_counter_mode;
       std::string old_protected_tables;
       std::string query_counter;
       getDatabaseValue(kPersistentSettings, "strict_mode_pub_key", old_key);
       getDatabaseValue(kPersistentSettings, "strict_mode_uuid_signing", old_uuid_signing);
       getDatabaseValue(kPersistentSettings, "strict_mode_tables", old_protected_tables);
       getDatabaseValue(kPersistentSettings, "strict_mode_query_counter", query_counter);
+      getDatabaseValue(kPersistentSettings, "strict_mode_counter_mode", old_counter_mode);
 
       if (old_key != b64Pub) {
         LOG(WARNING) << "osquery had its strict mode key changed!";
@@ -491,8 +493,12 @@ Status Config::updateSource(const std::string& source,
         setDatabaseValue(kPersistentSettings, "strict_mode_uuid_signing", uuid_signing);
       }
       if (old_protected_tables != protected_tables) {
-        LOG(WARNING) << "osquery had its protected tabled changed!";
+        LOG(WARNING) << "osquery had its protected tables changed!";
         setDatabaseValue(kPersistentSettings, "strict_mode_tables", protected_tables);
+      }
+      if (old_counter_mode != counter_mode) {
+        LOG(WARNING) << "osquery had its counter mode changed!";
+        setDatabaseValue(kPersistentSettings, "strict_mode_counter_mode", counter_mode);
       }
       if (query_counter == "") {
         LOG(WARNING) << "osquery could not find a query count, starting at 0";
