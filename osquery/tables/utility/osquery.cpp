@@ -21,8 +21,8 @@
 #include <osquery/system.h>
 #include <osquery/tables.h>
 
-#include "osquery/core/process.h"
 #include "osquery/core/conversions.h"
+#include "osquery/core/process.h"
 
 namespace osquery {
 
@@ -284,9 +284,12 @@ QueryData genOsqueryStrictMode(QueryContext& context) {
   std::string enabled;
   getDatabaseValue(kPersistentSettings, "strict_mode_enabled", enabled);
   getDatabaseValue(kPersistentSettings, "strict_mode_pub_key", strict_mode_key);
-  getDatabaseValue(kPersistentSettings, "strict_mode_uuid_signing", uuid_signing);
-  getDatabaseValue(kPersistentSettings, "strict_mode_query_counter", query_counter);
-  getDatabaseValue(kPersistentSettings, "strict_mode_counter_mode", counter_mode);
+  getDatabaseValue(
+      kPersistentSettings, "strict_mode_uuid_signing", uuid_signing);
+  getDatabaseValue(
+      kPersistentSettings, "strict_mode_query_counter", query_counter);
+  getDatabaseValue(
+      kPersistentSettings, "strict_mode_counter_mode", counter_mode);
   size_t counter;
   safeStrtoul(query_counter, 10, counter);
   Row r;

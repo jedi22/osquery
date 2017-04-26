@@ -18,8 +18,8 @@
 #include <osquery/system.h>
 
 #include "osquery/core/conversions.h"
-#include "osquery/core/signing.h"
 #include "osquery/core/json.h"
+#include "osquery/core/signing.h"
 
 namespace pt = boost::property_tree;
 
@@ -199,7 +199,8 @@ Status Distributed::acceptWork(const std::string& work) {
         }
         if (doesQueryRequireSignature(query)) {
           if (signatures.count(node.first + "_disc") > 0) {
-            if (!verifyQuerySignature(signatures[node.first + "_disc"], query).ok()) {
+            if (!verifyQuerySignature(signatures[node.first + "_disc"], query)
+                     .ok()) {
               // Verification failed so don't run
               LOG(INFO) << "Failed verification for: " << query;
               continue;
