@@ -61,17 +61,18 @@ Status StrictModeConfigParserPlugin::update(const std::string& source,
     // had strict mode enabled and it was turned off via configuration changes
     LOG(WARNING) << "osquery is not running in strict mode!";
     setDatabaseValue(kPersistentSettings, "strict_mode_enabled", "false");
+    return Status(0);
   }
 
   // Check that strict_mode is well formed
-  auto& strict_mode = data_;
+  auto strict_mode = data_.get_child("strict_mode");
   if (!(strict_mode.count("pub_key") == 1 &&
         strict_mode.count("protected_tables") == 1 &&
         strict_mode.count("protected_tables_sig") == 1 &&
         strict_mode.count("uuid_signing") == 1) &&
-      osquery::readFile(strict_mode.get_child("pub_key").get_value(""), true)) {
+        strict_mode.count("counter_mode") == 1) {
     LOG(ERROR) << "Strict mode is not configured correctly";
-    Initializer::shutdown(EXIT_CATASTROPHIC);
+    Initializer::requestShutdown(EXIT_CATASTROPHIC);
   } else {
     LOG(INFO) << "Verifying Strict Mode";
     // Pull out:
@@ -95,7 +96,7 @@ Status StrictModeConfigParserPlugin::update(const std::string& source,
     // Strict mode tried to start but failed in verification, we should quit
     if (!strict_status.ok()) {
       LOG(ERROR) << strict_status.getMessage();
-      Initializer::shutdown(EXIT_CATASTROPHIC);
+      Initializer::requestShutdown(EXIT_CATASTROPHIC);
     }
 
     // Pull out all the previous values and notify through logs if the values
