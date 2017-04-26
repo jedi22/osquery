@@ -105,7 +105,7 @@ if(NOT WINDOWS)
   ADD_OSQUERY_LINK_ADDITIONAL("snappy")
   ADD_OSQUERY_LINK_ADDITIONAL("ssl")
   ADD_OSQUERY_LINK_ADDITIONAL("yara")
-  ADD_OSQUERY_LINK_CORE("crypto")
+  ADD_OSQUERY_LINK_ADDITIONAL("crypto")
   ADD_OSQUERY_LINK_ADDITIONAL("libpthread")
 
   # Linenoise will be used when compiling osqueryi.
