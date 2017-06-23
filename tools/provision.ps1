@@ -284,7 +284,6 @@ function Install-ThirdParty {
     "glog.0.3.4-r1",
     "openssl.1.0.2-k",
     "rocksdb.5.1.4-r1",
-    "snappy-msvc.1.1.1.8",
     "thrift-dev.0.10.0-r2",
     "cpp-netlib.0.12.0-r3",
     "linenoise-ng.1.0.0-r1",

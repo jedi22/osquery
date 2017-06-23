@@ -12,7 +12,7 @@
 
 #include <sys/stat.h>
 
-#include <snappy.h>
+#include <zstd.h>
 
 #include <rocksdb/db.h>
 #include <rocksdb/env.h>
