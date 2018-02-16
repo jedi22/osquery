@@ -60,11 +60,6 @@ Status LocalTCPLoggerPlugin::logStatus(const std::vector<StatusLogLine>& log) {
 
 void LocalTCPLoggerPlugin::init(const std::string& name,
                               const std::vector<StatusLogLine>& log) {
-  // Stop the internal Glog facilities.
-  FLAGS_alsologtostderr = false;
-  FLAGS_logtostderr = false;
-  FLAGS_stderrthreshold = 5;
-
   struct sockaddr_in server;
 
   /* Create a socket address, with a specific port and (local) ipnumber */
@@ -75,10 +70,17 @@ void LocalTCPLoggerPlugin::init(const std::string& name,
   /* Create socket */
   sock = socket(AF_INET, SOCK_STREAM, 0);
 
-  if (connect(sock, (struct sockaddr *)&server , sizeof(server)) < 0){
+  if (connect(sock, (struct sockaddr *)&server , sizeof(server)) < 0) {
+    LOG(ERROR) << "Could not connect to local logging port!";
     //Should be exit catastrohpic
     Initializer::requestShutdown(EXIT_CATASTROPHIC, "Could not configure logger");
   }
+
+  // Stop the internal Glog facilities.
+  FLAGS_alsologtostderr = false;
+  FLAGS_logtostderr = false;
+  FLAGS_stderrthreshold = 5;
+
   // Now funnel the intermediate status logs provided to `init`.
   logStatus(log);
 }
