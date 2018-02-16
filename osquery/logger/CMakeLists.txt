@@ -23,6 +23,7 @@ set(OSQUERY_LOGGER_PLUGINS
   "plugins/buffered.cpp"
   "plugins/filesystem_logger.cpp"
   "plugins/tls_logger.cpp"
+  "plugins/local_tcp.cpp"
   "plugins/stdout.cpp"
 )
 
