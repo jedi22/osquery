@@ -17,7 +17,7 @@
 namespace osquery {
 namespace tables {
 
-const std::map<CGEventType, std::string> kEventMap = {
+const std::unordered_map<CGEventType, std::string> kEventMap = {
     {kCGEventNull, "EventNull"},
     {kCGEventLeftMouseDown, "LeftMouseDown"},
     {kCGEventLeftMouseUp, "EventLeftMouseUp"},

@@ -37,7 +37,7 @@ struct XAttrAttribute {
 const std::string kMetadataXattr = "com.apple.metadata:kMDItemWhereFroms";
 const std::string kQuarantineXattr = "com.apple.quarantine";
 
-const std::map<std::string, std::string> kQuarantineKeys = {
+const std::unordered_map<std::string, std::string> kQuarantineKeys = {
     {"quarantine_agent", "LSQuarantineAgentName"},
     {"quarantine_type", "LSQuarantineType"},
     {"quarantine_timestamp", "LSQuarantineTimeStamp"},

@@ -36,7 +36,7 @@ extern const std::vector<std::string> kUserKeychainPaths;
 // The flags are defined in openssl/x509v3.h,
 // and its keys in crypto/x509v3/v3_bitst.c
 // clang-format off
-const std::map<uint32_t, std::string> kKeyUsageFlags = {
+const std::unordered_map<uint32_t, std::string> kKeyUsageFlags = {
     {0x0001, "Encipher Only"},
     {0x0002, "CRL Sign"},
     {0x0004, "Key Cert Sign"},

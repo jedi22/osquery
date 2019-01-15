@@ -358,8 +358,8 @@ std::string getProcCmdline(int pid) {
   return cmdline;
 }
 
-std::map<std::string, std::string> getProcEnv(int pid, size_t argmax) {
-  std::map<std::string, std::string> env;
+std::unordered_map<std::string, std::string> getProcEnv(int pid, size_t argmax) {
+  std::unordered_map<std::string, std::string> env;
   std::unique_ptr<char[]> pprocargs{new char[argmax]};
   char* procargs = pprocargs.get();
   int mib[3] = {CTL_KERN, KERN_PROCARGS2, pid};
@@ -550,7 +550,7 @@ void genMemoryRegion(int pid,
                      const vm_address_t& address,
                      const vm_size_t& size,
                      struct vm_region_submap_info_64& info,
-                     const std::map<vm_address_t, std::string>& libraries,
+                     const std::unordered_map<vm_address_t, std::string>& libraries,
                      QueryData& results) {
   Row r;
   r["pid"] = INTEGER(pid);
@@ -651,7 +651,7 @@ static bool readProcessMemory(const mach_port_t& task,
 }
 
 void genProcessLibraries(const mach_port_t& task,
-                         std::map<vm_address_t, std::string>& libraries) {
+                         std::unordered_map<vm_address_t, std::string>& libraries) {
   struct task_dyld_info dyld_info;
   mach_msg_type_number_t count = TASK_DYLD_INFO_COUNT;
   auto status =
@@ -724,7 +724,7 @@ void genProcessMemoryMap(int pid, QueryData& results, bool exe_only = false) {
   }
 
   // Create a map of library paths from the dyld cache.
-  std::map<vm_address_t, std::string> libraries;
+  std::unordered_map<vm_address_t, std::string> libraries;
   if (!exe_only) {
     genProcessLibraries(task, libraries);
   }

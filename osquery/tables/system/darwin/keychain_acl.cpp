@@ -37,7 +37,7 @@ typedef struct {
   std::vector<std::string> applications;
 } KeychainItemACL;
 
-const std::map<CSSM_ACL_AUTHORIZATION_TAG, std::string> kACLAuthorizationTags =
+const std::unordered_map<CSSM_ACL_AUTHORIZATION_TAG, std::string> kACLAuthorizationTags =
     {
         {CSSM_ACL_AUTHORIZATION_ANY, "any"},
         {CSSM_ACL_AUTHORIZATION_LOGIN, "login"},

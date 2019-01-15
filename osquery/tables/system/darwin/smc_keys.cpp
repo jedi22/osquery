@@ -115,7 +115,7 @@ std::set<std::string> kSMCPowerKeys = {
     "PO0R", "PBLC", "PB0R", "PDTR", "PSTR",
 };
 
-std::map<std::string, std::string> kSMCFanSpeeds = {
+std::unordered_map<std::string, std::string> kSMCFanSpeeds = {
     {"F%dID", "name"},
     {"F%dAc", "actual"},
     {"F%dMn", "min"},
@@ -124,7 +124,7 @@ std::map<std::string, std::string> kSMCFanSpeeds = {
 // clang-format on
 
 /// See the following article for reference: http://superuser.com/a/967056
-const std::map<std::string, std::string> kSMCKeyDescriptions = {
+const std::unordered_map<std::string, std::string> kSMCKeyDescriptions = {
     {"TCXC", "PECI CPU"},
     {"TCXc", "PECI CPU"},
     {"TC0P", "CPU 1 Proximity"},

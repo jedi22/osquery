@@ -45,14 +45,14 @@ extern const std::string kALFPlistPath;
 
 // kFirewallTreeKeys is a map of keys and columns which are used while parsing
 // in the function parseALFServicesTree
-extern const std::map<std::string, std::string> kFirewallTreeKeys;
+extern const std::unordered_map<std::string, std::string> kFirewallTreeKeys;
 
 // kTopLevelIntKeys is a map of keys and columns which are used while parsing
 // in the function parseALFTree
-extern const std::map<std::string, std::string> kTopLevelIntKeys;
+extern const std::unordered_map<std::string, std::string> kTopLevelIntKeys;
 
 // kTopLevelStringKeys is a map of keys and columns which are used while
 // parsing in the function parseALFTree
-extern const std::map<std::string, std::string> kTopLevelStringKeys;
+extern const std::unordered_map<std::string, std::string> kTopLevelStringKeys;
 }
 }

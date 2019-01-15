@@ -37,7 +37,7 @@ const std::vector<std::string> kUserLaunchdSearchPaths = {
     "/Library/LaunchAgents",
 };
 
-const std::map<std::string, std::string> kLaunchdTopLevelStringKeys = {
+const std::unordered_map<std::string, std::string> kLaunchdTopLevelStringKeys = {
     {"Label", "label"},
     {"RunAtLoad", "run_at_load"},
     {"KeepAlive", "keep_alive"},
@@ -56,7 +56,7 @@ const std::map<std::string, std::string> kLaunchdTopLevelStringKeys = {
     {"ProcessType", "process_type"},
 };
 
-const std::map<std::string, std::string> kLaunchdTopLevelArrayKeys = {
+const std::unordered_map<std::string, std::string> kLaunchdTopLevelArrayKeys = {
     {"ProgramArguments", "program_arguments"},
     {"WatchPaths", "watch_paths"},
     {"QueueDirectories", "queue_directories"},

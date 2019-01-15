@@ -40,7 +40,7 @@ void genPolicy(const std::string& path,
   }
 
   // Iterate through the list of plist keys.
-  std::map<std::string, std::string> settings;
+  std::unordered_map<std::string, std::string> settings;
   for (const auto& item : tree) {
     auto key = std::string(item.first.data());
     auto value = std::string(item.second.data());

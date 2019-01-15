@@ -37,7 +37,7 @@ const std::vector<std::string> kPkgReceiptUserPaths = {
 const std::string kPkgInstallHistoryPath =
     "/Library/Receipts/InstallHistory.plist";
 
-const std::map<std::string, std::string> kPkgReceiptKeys = {
+const std::unordered_map<std::string, std::string> kPkgReceiptKeys = {
     {"PackageIdentifier", "package_id"},
     {"PackageFileName", "package_filename"},
     {"PackageVersion", "version"},
@@ -46,7 +46,7 @@ const std::map<std::string, std::string> kPkgReceiptKeys = {
     {"InstallProcessName", "installer_name"},
 };
 
-const std::map<std::string, std::string> kPKReceiptKeys{
+const std::unordered_map<std::string, std::string> kPKReceiptKeys{
     {"package_id", "packageIdentifier"},
     {"installer_name", "installProcessName"},
     {"install_time", "installDate"},
@@ -55,7 +55,7 @@ const std::map<std::string, std::string> kPKReceiptKeys{
     {"path", "receiptStoragePaths"},
 };
 
-const std::map<std::string, std::string> kPkgInstallHistoryKeys = {
+const std::unordered_map<std::string, std::string> kPkgInstallHistoryKeys = {
     {"date", "time"},
     {"displayName", "name"},
     {"displayVersion", "version"},
@@ -162,8 +162,8 @@ void genBOMPaths(const std::string& path,
                  const BOM& bom,
                  const BOMPaths* paths,
                  QueryData& results) {
-  std::map<uint32_t, std::string> filenames;
-  std::map<uint32_t, uint32_t> parents;
+  std::unordered_map<uint32_t, std::string> filenames;
+  std::unordered_map<uint32_t, uint32_t> parents;
 
   while (paths != nullptr) {
     for (unsigned j = 0; j < ntohs(paths->count); j++) {

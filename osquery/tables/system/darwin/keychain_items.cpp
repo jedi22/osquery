@@ -25,7 +25,7 @@ const std::vector<CFTypeRef> kKeychainItemTypes = {
     kSecClassIdentity,
 };
 
-const std::map<SecItemAttr, std::string> kKeychainItemAttrs = {
+const std::unordered_map<SecItemAttr, std::string> kKeychainItemAttrs = {
     {kSecLabelItemAttr, "label"},
     {kSecDescriptionItemAttr, "description"},
     {kSecCommentItemAttr, "comment"},
@@ -33,7 +33,7 @@ const std::map<SecItemAttr, std::string> kKeychainItemAttrs = {
     {kSecModDateItemAttr, "modified"},
 };
 
-const std::map<SecItemClass, std::string> kKeychainItemClasses = {
+const std::unordered_map<SecItemClass, std::string> kKeychainItemClasses = {
     {kSecGenericPasswordItemClass, "password"},
     {kSecCertificateItemClass, "certificate"},
     {kSecPublicKeyItemClass, "public key"},

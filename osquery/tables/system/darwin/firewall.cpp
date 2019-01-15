@@ -28,7 +28,7 @@ namespace tables {
 const std::string kALFPlistPath{"/Library/Preferences/com.apple.alf.plist"};
 
 /// Well known keys within the plist containing settings.
-const std::map<std::string, std::string> kTopLevelIntKeys{
+const std::unordered_map<std::string, std::string> kTopLevelIntKeys {
     {"allowsignedenabled", "allow_signed_enabled"},
     {"allowdownloadsignedenabled", "allow_downloads_signed_enabled"},
     {"firewallunload", "firewall_unload"},
@@ -39,7 +39,7 @@ const std::map<std::string, std::string> kTopLevelIntKeys{
 };
 
 /// Well known keys within the plist containing settings (as strings).
-const std::map<std::string, std::string> kTopLevelStringKeys{
+const std::unordered_map<std::string, std::string> kTopLevelStringKeys {
     {"version", "version"},
 };
 

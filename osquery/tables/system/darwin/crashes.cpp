@@ -29,7 +29,7 @@ namespace osquery {
 namespace tables {
 
 /// Set of registers, x86 and x64, that we collect from crash logs
-const std::set<std::string> kRegisters = {
+const std::unordered_set<std::string> kRegisters = {
     "eax", "edi", "ss", "ds", "rax", "rdi", "r8", "r12", "rip", "x0", "x4"};
 
 /// Location of the system application crash logs in OS X
@@ -40,7 +40,7 @@ const std::string kMobileDiagnosticReportsPath =
     "/Library/Logs/CrashReporter/MobileDevice";
 
 /// Map of the values we currently parse out of the log file
-const std::map<std::string, std::string> kCrashDumpKeys = {
+const std::unordered_map<std::string, std::string> kCrashDumpKeys = {
     {"Process", "pid"},
     {"Path", "path"},
     {"Log Location", "crash_path"},

@@ -19,7 +19,7 @@ namespace tables {
 
 // rootless configuration flags
 // https://opensource.apple.com/source/xnu/xnu-3248.20.55/bsd/sys/csr.h
-const std::map<std::string, uint32_t> kRootlessConfigFlags = {
+const std::unordered_map<std::string, uint32_t> kRootlessConfigFlags = {
     // CSR_ALLOW_UNTRUSTED_KEXTS
     {"allow_untrusted_kexts", (1 << 0)},
     // CSR_ALLOW_UNRESTRICTED_FS

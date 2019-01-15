@@ -23,7 +23,7 @@ namespace tables {
 /**
  * @brief Map osquery ConstraintOperator to the corresponding ASL op code
  */
-const std::map<ConstraintOperator, uint32_t> kSupportedAslOps = {
+const std::unordered_map<ConstraintOperator, uint32_t> kSupportedAslOps = {
     {EQUALS, ASL_QUERY_OP_EQUAL},
     {GREATER_THAN, ASL_QUERY_OP_GREATER},
     {GREATER_THAN_OR_EQUALS, ASL_QUERY_OP_GREATER_EQUAL},
@@ -34,7 +34,7 @@ const std::map<ConstraintOperator, uint32_t> kSupportedAslOps = {
 /**
  * @brief Map ASL keys to the corresponding osquery column name
  */
-const std::map<std::string, std::string> kAslKeyToColumnMap = {
+const std::unordered_map<std::string, std::string> kAslKeyToColumnMap = {
     {"Time", "time"},
     {"TimeNanoSec", "time_nano_sec"},
     {"Host", "host"},
@@ -51,7 +51,7 @@ const std::map<std::string, std::string> kAslKeyToColumnMap = {
 /**
  * @brief Map osquery column names to the corresponding ASL keys
  */
-const std::map<std::string, std::string> kColumnToAslKeyMap = {
+const std::unordered_map<std::string, std::string> kColumnToAslKeyMap = {
     {"time", "Time"},
     {"time_nano_sec", "TimeNanoSec"},
     {"host", "Host"},

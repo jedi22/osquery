@@ -30,7 +30,7 @@ namespace pt = boost::property_tree;
 namespace osquery {
 namespace tables {
 
-const std::map<std::string, std::string> kAppsInfoPlistTopLevelStringKeys = {
+const std::unordered_map<std::string, std::string> kAppsInfoPlistTopLevelStringKeys = {
     {"CFBundleExecutable", "bundle_executable"},
     {"CFBundleIdentifier", "bundle_identifier"},
     {"CFBundleName", "bundle_name"},
@@ -67,7 +67,7 @@ enum AppSchemeFlags {
   kSchemeProtected = 2,
 };
 
-const std::map<std::string, unsigned short> kApplicationSchemes = {
+const std::unordered_map<std::string, unsigned short> kApplicationSchemes = {
     {"account", 0},
     {"addressbook", kSchemeSystemDefault},
     {"afp", kSchemeSystemDefault | kSchemeProtected},

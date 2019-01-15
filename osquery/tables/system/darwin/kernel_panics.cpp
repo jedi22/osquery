@@ -28,7 +28,7 @@ namespace tables {
 const std::string kDiagnosticReportsPath = "/Library/Logs/DiagnosticReports";
 
 /// List of all register values we wish to catch
-const std::set<std::string> kKernelRegisters = {
+const std::unordered_set<std::string> kKernelRegisters = {
     "CR0",
     "RAX",
     "RSP",
@@ -38,10 +38,10 @@ const std::set<std::string> kKernelRegisters = {
 };
 
 /// List of the days of the Week, used to grab our timestamp.
-const std::set<std::string> kDays = {"Mon", "Tue", "Wed", "Thu", "Fri"};
+const std::unordered_set<std::string> kDays = {"Mon", "Tue", "Wed", "Thu", "Fri"};
 
 /// Map of the values we currently parse out of the log file
-const std::map<std::string, std::string> kKernelPanicKeys = {
+const std::unordered_map<std::string, std::string> kKernelPanicKeys = {
     {"dependency", "dependencies"},
     {"BSD process name corresponding to current thread", "name"},
     {"System model name", "system_model"},
